@@ -2,7 +2,6 @@ package com.example.tasktracker.service;
 
 import com.example.tasktracker.enums.TaskSortType;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,22 +17,10 @@ public class TaskSortService {
         }
 
         return switch (sortType) {
-            case PRIORITY_LOW_TO_HIGH ->
-                    JpaSort.unsafe(
-                            "CASE " +
-                                    "WHEN priority = 'LOW' THEN 1 " +
-                                    "WHEN priority = 'MEDIUM' THEN 2 " +
-                                    "WHEN priority = 'HIGH' THEN 3 " +
-                                    "END"
-                    );
-            case PRIORITY_HIGH_TO_LOW ->
-                    JpaSort.unsafe(
-                            "CASE " +
-                                    "WHEN priority = 'HIGH' THEN 1 " +
-                                    "WHEN priority = 'MEDIUM' THEN 2 " +
-                                    "WHEN priority = 'LOW' THEN 3 " +
-                                    "END"
-                    );
+
+            case PRIORITY_HIGH_TO_LOW, PRIORITY_LOW_TO_HIGH ->
+                    Sort.unsorted();
+
             case DEADLINE_ASC ->
                     Sort.by(
                             Sort.Direction.ASC,

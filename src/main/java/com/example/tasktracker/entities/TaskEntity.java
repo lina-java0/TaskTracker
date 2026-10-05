@@ -1,10 +1,11 @@
 package com.example.tasktracker.entities;
 
-import com.example.tasktracker.enums.Category;
-import com.example.tasktracker.enums.Priority;
-import com.example.tasktracker.enums.TaskStatus;
+import com.example.tasktracker.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+
+import java.sql.Types;
 import java.time.*;
 
 @Entity
@@ -26,16 +27,19 @@ public class TaskEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(Types.VARCHAR)
     @Column(nullable = false)
     private TaskStatus status;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(Types.VARCHAR)
     @Column(nullable = false)
     private Priority priority;
 
     private LocalDate deadline;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(Types.VARCHAR)
     @Column(nullable = false)
     private Category category;
 

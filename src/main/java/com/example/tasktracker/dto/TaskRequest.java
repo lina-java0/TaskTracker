@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class TaskRequest {
+
     @NotBlank(message = "Title cannot be blank")
     @Size(max = 100, message = "Title must be at most 100 characters")
     private String title;

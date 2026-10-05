@@ -9,6 +9,9 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class TaskFilterRequest {
+
+    private String search;
+
     private Priority priority;
 
     private Category category;
@@ -21,7 +24,7 @@ public class TaskFilterRequest {
 
     private LocalDate deadlineBefore;
 
-    private boolean withoutDeadline;
+    private Boolean withoutDeadline;
 
     private TaskSortType sortType;
 }

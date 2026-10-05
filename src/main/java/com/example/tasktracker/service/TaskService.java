@@ -7,13 +7,12 @@ import com.example.tasktracker.entities.TaskEntity;
 import com.example.tasktracker.repository.TaskRepository;
 import com.example.tasktracker.specification.TaskSpecificationBuilder;
 import com.example.tasktracker.validation.TaskFilterValidator;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,12 +21,30 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskSortService taskSortService;
     private final TaskFilterValidator taskFilterValidator;
+    private final TaskHistoryService taskHistoryService;
 
-    public List<TaskEntity> getTasks(TaskFilterRequest filterRequest) {
+    public Page<TaskEntity> getTasks(
+            TaskFilterRequest filterRequest,
+            int page,
+            int size) {
+
+        if (page < 0) {
+            throw new IllegalArgumentException("Page cannot be negative");
+        }
+
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("Page size must be between 1 and 100");
+        }
+
         taskFilterValidator.validate(filterRequest);
+
         Specification<TaskEntity> specification = TaskSpecificationBuilder.build(filterRequest);
+
         Sort sort = taskSortService.getSort(filterRequest.getSortType());
-        return taskRepository.findAll(specification, sort);
+
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        return taskRepository.findAll(specification, pageRequest);
     }
 
     public TaskEntity getTaskById(Long id) {
@@ -45,32 +62,31 @@ public class TaskService {
                 .status(TaskStatus.TODO)
                 .build();
 
-        return taskRepository.save(taskEntity);
-    }
+        TaskEntity savedTask = taskRepository.save(taskEntity);
 
-    @Transactional
-    public TaskEntity updateTask(Long id, TaskUpdateRequest request) {
-        TaskEntity taskEntity = getTaskById(id);
+        taskHistoryService.addHistory(
+                savedTask.getId(),
+                TaskHistoryAction.CREATED,
+                "Task created",
+                null,
+                null
+        );
 
-        taskEntity.setTitle(request.getTitle());
-        taskEntity.setDescription(request.getDescription());
-        taskEntity.setPriority(request.getPriority());
-        taskEntity.setDeadline(request.getDeadline());
-        taskEntity.setCategory(request.getCategory());
-
-        return taskEntity;
-    }
-
-    @Transactional
-    public TaskEntity changeStatus(Long id, TaskStatus status) {
-        TaskEntity taskEntity = getTaskById(id);
-        taskEntity.setStatus(status);
-        return taskEntity;
+        return savedTask;
     }
 
     @Transactional
     public void deleteTask(Long id) {
         TaskEntity taskEntity = getTaskById(id);
+
+        taskHistoryService.addHistory(
+                taskEntity.getId(),
+                TaskHistoryAction.DELETED,
+                "Task deleted",
+                null,
+                null
+        );
+
         taskRepository.delete(taskEntity);
     }
 }

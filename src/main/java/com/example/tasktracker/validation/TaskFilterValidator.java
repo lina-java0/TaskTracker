@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 public class TaskFilterValidator {
 
     public void validate(TaskFilterRequest filterRequest) {
-        if (filterRequest.isWithoutDeadline() && hasDeadlineFilter(filterRequest)) {
-            throw new IllegalArgumentException("Filter withoutDeadline cannot be combined with deadline filters");
+        if (Boolean.TRUE.equals(filterRequest.getWithoutDeadline())
+                && hasDeadlineFilter(filterRequest)) {
+            throw new IllegalArgumentException(
+                    "Filter withoutDeadline cannot be combined with deadline filters");
         }
     }
 
