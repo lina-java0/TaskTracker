@@ -23,6 +23,29 @@ public class TaskService {
     private final TaskFilterValidator taskFilterValidator;
     private final TaskHistoryService taskHistoryService;
 
+    public TaskEntity createTask(TaskRequest request) {
+        TaskEntity taskEntity = TaskEntity.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .priority(request.getPriority())
+                .deadline(request.getDeadline())
+                .category(request.getCategory())
+                .status(TaskStatus.TODO)
+                .build();
+
+        TaskEntity savedTask = taskRepository.save(taskEntity);
+
+        taskHistoryService.addHistory(
+                savedTask.getId(),
+                TaskHistoryAction.CREATED,
+                "Task created",
+                null,
+                null
+        );
+
+        return savedTask;
+    }
+
     public Page<TaskEntity> getTasks(
             TaskFilterRequest filterRequest,
             int page,
@@ -50,29 +73,6 @@ public class TaskService {
     public TaskEntity getTaskById(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + id));
-    }
-
-    public TaskEntity createTask(TaskRequest request) {
-        TaskEntity taskEntity = TaskEntity.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .priority(request.getPriority())
-                .deadline(request.getDeadline())
-                .category(request.getCategory())
-                .status(TaskStatus.TODO)
-                .build();
-
-        TaskEntity savedTask = taskRepository.save(taskEntity);
-
-        taskHistoryService.addHistory(
-                savedTask.getId(),
-                TaskHistoryAction.CREATED,
-                "Task created",
-                null,
-                null
-        );
-
-        return savedTask;
     }
 
     @Transactional

@@ -1,14 +1,11 @@
-package com.example.tasktracker.controller;
+package com.example.tasktracker.unit_tests.controller;
 
+import com.example.tasktracker.controller.TaskController;
 import com.example.tasktracker.dto.TaskRequest;
 import com.example.tasktracker.dto.TaskUpdateRequest;
 import com.example.tasktracker.entities.TaskEntity;
-import com.example.tasktracker.enums.Category;
-import com.example.tasktracker.enums.Priority;
-import com.example.tasktracker.enums.TaskStatus;
-import com.example.tasktracker.service.TaskService;
-import com.example.tasktracker.service.TaskStatusService;
-import com.example.tasktracker.service.TaskUpdateService;
+import com.example.tasktracker.enums.*;
+import com.example.tasktracker.service.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,11 +18,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.mockito.ArgumentCaptor;
 
 @WebMvcTest(TaskController.class)
 class TaskControllerTest {
@@ -79,7 +78,10 @@ class TaskControllerTest {
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.totalElements").value(11))
+                .andExpect(jsonPath("$.number").value(1))
+                .andExpect(jsonPath("$.size").value(10));
     }
 
     @Test
@@ -124,16 +126,26 @@ class TaskControllerTest {
                         .value("Task created successfully"))
                 .andExpect(jsonPath("$.data.id").value(1))
                 .andExpect(jsonPath("$.data.title").value("Test task"));
+
+        ArgumentCaptor<TaskRequest> captor = ArgumentCaptor.forClass(TaskRequest.class);
+
+        verify(taskService).createTask(captor.capture());
+
+        TaskRequest result = captor.getValue();
+
+        assertEquals("Test task", result.getTitle());
+        assertEquals("Test description", result.getDescription());
+        assertEquals(Priority.MEDIUM, result.getPriority());
+        assertEquals(LocalDate.of(2030, 1, 1), result.getDeadline());
+        assertEquals(Category.WORK, result.getCategory());
     }
 
     @Test
     void shouldUpdateTask() throws Exception {
         TaskEntity task = createTask();
 
-        when(taskUpdateService.updateTask(
-                eq(1L),
-                any(TaskUpdateRequest.class)
-        )).thenReturn(task);
+        when(taskUpdateService.updateTask(eq(1L), any(TaskUpdateRequest.class)))
+                .thenReturn(task);
 
         String request = """
                 {
@@ -152,6 +164,18 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value("Task updated successfully"))
                 .andExpect(jsonPath("$.data.id").value(1));
+
+        ArgumentCaptor<TaskUpdateRequest> captor = ArgumentCaptor.forClass(TaskUpdateRequest.class);
+
+        verify(taskUpdateService).updateTask(eq(1L), captor.capture());
+
+        TaskUpdateRequest result = captor.getValue();
+
+        assertEquals("Updated task", result.getTitle());
+        assertEquals("Updated description", result.getDescription());
+        assertEquals(Priority.HIGH, result.getPriority());
+        assertEquals(LocalDate.of(2030, 1, 1), result.getDeadline());
+        assertEquals(Category.WORK, result.getCategory());
     }
 
     @Test
@@ -175,6 +199,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value("Task status changed successfully"))
                 .andExpect(jsonPath("$.data.status").value("DONE"));
+
+        verify(taskStatusService).changeStatus(1L, TaskStatus.DONE);
     }
 
     @Test
@@ -227,8 +253,7 @@ class TaskControllerTest {
                         .content(request))
                 .andExpect(status().isBadRequest());
 
-        verify(taskUpdateService, never())
-                .updateTask(anyLong(), any());
+        verify(taskUpdateService, never()).updateTask(anyLong(), any());
     }
 
     @Test
@@ -244,8 +269,7 @@ class TaskControllerTest {
                         .content(request))
                 .andExpect(status().isBadRequest());
 
-        verify(taskStatusService, never())
-                .changeStatus(anyLong(), any());
+        verify(taskStatusService, never()).changeStatus(anyLong(), any());
     }
 
     private TaskEntity createTask() {

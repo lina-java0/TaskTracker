@@ -1,5 +1,6 @@
-package com.example.tasktracker.controller;
+package com.example.tasktracker.unit_tests.controller;
 
+import com.example.tasktracker.controller.TaskHistoryController;
 import com.example.tasktracker.dto.TaskHistoryResponse;
 import com.example.tasktracker.enums.TaskHistoryAction;
 import com.example.tasktracker.service.TaskHistoryService;

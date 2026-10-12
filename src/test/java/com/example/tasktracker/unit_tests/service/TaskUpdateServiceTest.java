@@ -1,8 +1,9 @@
-package com.example.tasktracker.service;
+package com.example.tasktracker.unit_tests.service;
 
 import com.example.tasktracker.dto.TaskUpdateRequest;
 import com.example.tasktracker.entities.TaskEntity;
 import com.example.tasktracker.enums.*;
+import com.example.tasktracker.service.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,6 +29,49 @@ class TaskUpdateServiceTest {
     @InjectMocks
     private TaskUpdateService taskUpdateService;
 
+    @Test
+    void shouldUpdateTitleAndAddHistory() {
+
+        TaskEntity task = createTask();
+
+        TaskUpdateRequest request = createRequestBuilder()
+                .title("New title")
+                .build();
+
+        mockAndUpdateTask(task, request);
+
+        assertEquals("New title", task.getTitle());
+
+        verify(taskHistoryService).addHistory(
+                task.getId(),
+                TaskHistoryAction.TITLE_CHANGED,
+                "Title changed",
+                "Old title",
+                "New title"
+        );
+    }
+
+    @Test
+    void shouldUpdateDescriptionAndAddHistory() {
+
+        TaskEntity task = createTask();
+
+        TaskUpdateRequest request = createRequestBuilder()
+                .description("New description")
+                .build();
+
+        mockAndUpdateTask(task, request);
+
+        assertEquals("New description", task.getDescription());
+
+        verify(taskHistoryService).addHistory(
+                task.getId(),
+                TaskHistoryAction.DESCRIPTION_CHANGED,
+                "Description changed",
+                "Old description",
+                "New description"
+        );
+    }
 
     @ParameterizedTest
     @EnumSource(Priority.class)
@@ -39,10 +83,7 @@ class TaskUpdateServiceTest {
                 .priority(newPriority)
                 .build();
 
-        when(taskService.getTaskById(1L))
-                .thenReturn(task);
-
-        taskUpdateService.updateTask(1L, request);
+        mockAndUpdateTask(task, request);
 
         assertEquals(newPriority, task.getPriority());
 
@@ -53,6 +94,14 @@ class TaskUpdateServiceTest {
                     "Priority changed",
                     "LOW",
                     newPriority.name()
+            );
+        } else {
+            verify(taskHistoryService, never()).addHistory(
+                    anyLong(),
+                    any(),
+                    any(),
+                    any(),
+                    anyString()
             );
         }
     }
@@ -67,10 +116,7 @@ class TaskUpdateServiceTest {
                 .category(newCategory)
                 .build();
 
-        when(taskService.getTaskById(1L))
-                .thenReturn(task);
-
-        taskUpdateService.updateTask(1L, request);
+        mockAndUpdateTask(task, request);
 
         assertEquals(newCategory, task.getCategory());
 
@@ -81,6 +127,14 @@ class TaskUpdateServiceTest {
                     "Category changed",
                     "WORK",
                     newCategory.name()
+            );
+        } else {
+            verify(taskHistoryService, never()).addHistory(
+                    anyLong(),
+                    any(),
+                    any(),
+                    any(),
+                    anyString()
             );
         }
     }
@@ -95,10 +149,7 @@ class TaskUpdateServiceTest {
                 .deadline(newDeadline)
                 .build();
 
-        when(taskService.getTaskById(1L))
-                .thenReturn(task);
-
-        taskUpdateService.updateTask(1L, request);
+        mockAndUpdateTask(task, request);
 
         assertEquals(newDeadline, task.getDeadline());
 
@@ -112,70 +163,16 @@ class TaskUpdateServiceTest {
     }
 
     @Test
-    void shouldAddUpdatedHistoryWhenTitleChanges() {
-
-        TaskEntity task = createTask();
-
-        TaskUpdateRequest request = createRequestBuilder()
-                .title("New title")
-                .build();
-
-        when(taskService.getTaskById(1L))
-                .thenReturn(task);
-
-        taskUpdateService.updateTask(1L, request);
-
-        assertEquals("New title", task.getTitle());
-
-        verify(taskHistoryService).addHistory(
-                1L,
-                TaskHistoryAction.UPDATED,
-                "Task updated",
-                null,
-                null
-        );
-    }
-
-    @Test
-    void shouldAddUpdatedHistoryWhenDescriptionChanges() {
-
-        TaskEntity task = createTask();
-
-        TaskUpdateRequest request = createRequestBuilder()
-                .description("New description")
-                .build();
-
-        when(taskService.getTaskById(1L))
-                .thenReturn(task);
-
-        taskUpdateService.updateTask(1L, request);
-
-        assertEquals("New description", task.getDescription());
-
-        verify(taskHistoryService).addHistory(
-                1L,
-                TaskHistoryAction.UPDATED,
-                "Task updated",
-                null,
-                null
-        );
-    }
-
-    @Test
     void shouldNotAddHistoryWhenNothingChanged() {
 
         TaskEntity task = createTask();
 
         TaskUpdateRequest request = createRequestBuilder().build();
 
-        when(taskService.getTaskById(1L))
-                .thenReturn(task);
-
-        taskUpdateService.updateTask(1L, request);
+        mockAndUpdateTask(task, request);
 
         verifyNoInteractions(taskHistoryService);
     }
-
 
     private TaskEntity createTask() {
         return TaskEntity.builder()
@@ -188,7 +185,6 @@ class TaskUpdateServiceTest {
                 .build();
     }
 
-
     private TaskUpdateRequest.TaskUpdateRequestBuilder createRequestBuilder() {
         return TaskUpdateRequest.builder()
                 .title("Old title")
@@ -196,5 +192,10 @@ class TaskUpdateServiceTest {
                 .priority(Priority.LOW)
                 .category(Category.WORK)
                 .deadline(LocalDate.of(2026, 10, 10));
+    }
+
+    private void mockAndUpdateTask(TaskEntity task, TaskUpdateRequest request) {
+        when(taskService.getTaskById(1L)).thenReturn(task);
+        taskUpdateService.updateTask(1L, request);
     }
 }

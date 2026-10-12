@@ -22,16 +22,8 @@ public class TaskUpdateService {
 
         TaskEntity taskEntity = taskService.getTaskById(id);
 
-        boolean titleChanged =
-                !Objects.equals(
-                        taskEntity.getTitle(),
-                        request.getTitle());
-
-        boolean descriptionChanged =
-                !Objects.equals(
-                        taskEntity.getDescription(),
-                        request.getDescription());
-
+        String oldTitle = taskEntity.getTitle();
+        String oldDescription = taskEntity.getDescription();
         Priority oldPriority = taskEntity.getPriority();
         Category oldCategory = taskEntity.getCategory();
         LocalDate oldDeadline = taskEntity.getDeadline();
@@ -42,13 +34,23 @@ public class TaskUpdateService {
         taskEntity.setDeadline(request.getDeadline());
         taskEntity.setCategory(request.getCategory());
 
-        if (titleChanged || descriptionChanged) {
+        if (!oldTitle.equals(taskEntity.getTitle())) {
             taskHistoryService.addHistory(
                     taskEntity.getId(),
-                    TaskHistoryAction.UPDATED,
-                    "Task updated",
-                    null,
-                    null
+                    TaskHistoryAction.TITLE_CHANGED,
+                    "Title changed",
+                    oldTitle,
+                    taskEntity.getTitle()
+            );
+        }
+
+        if (!oldDescription.equals(taskEntity.getDescription())) {
+            taskHistoryService.addHistory(
+                    taskEntity.getId(),
+                    TaskHistoryAction.DESCRIPTION_CHANGED,
+                    "Description changed",
+                    oldDescription,
+                    taskEntity.getDescription()
             );
         }
 
@@ -57,7 +59,7 @@ public class TaskUpdateService {
                     taskEntity.getId(),
                     TaskHistoryAction.PRIORITY_CHANGED,
                     "Priority changed",
-                    oldPriority != null ? oldPriority.name() : null,
+                    (oldPriority != null) ? oldPriority.name() : null,
                     taskEntity.getPriority() != null
                             ? taskEntity.getPriority().name()
                             : null
@@ -69,7 +71,7 @@ public class TaskUpdateService {
                     taskEntity.getId(),
                     TaskHistoryAction.CATEGORY_CHANGED,
                     "Category changed",
-                    oldCategory != null ? oldCategory.name() : null,
+                    (oldCategory != null) ? oldCategory.name() : null,
                     taskEntity.getCategory() != null
                             ? taskEntity.getCategory().name()
                             : null

@@ -1,4 +1,4 @@
-package com.example.tasktracker.config;
+package com.example.tasktracker.config_notready;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

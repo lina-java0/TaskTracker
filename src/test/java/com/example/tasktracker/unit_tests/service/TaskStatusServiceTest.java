@@ -1,8 +1,8 @@
-package com.example.tasktracker.service;
+package com.example.tasktracker.unit_tests.service;
 
 import com.example.tasktracker.entities.TaskEntity;
-import com.example.tasktracker.enums.TaskHistoryAction;
-import com.example.tasktracker.enums.TaskStatus;
+import com.example.tasktracker.enums.*;
+import com.example.tasktracker.service.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -32,15 +32,12 @@ public class TaskStatusServiceTest {
             names = {"IN_PROGRESS", "DONE"}
     )
         void shouldChangeStatusAndAddHistory(TaskStatus newStatus) {
-            TaskEntity task = TaskEntity.builder()
-                    .id(1L)
-                    .status(TaskStatus.TODO)
-                    .build();
+
+            TaskEntity task = createTask(TaskStatus.TODO);
 
             when(taskService.getTaskById(1L)).thenReturn(task);
 
-            TaskEntity result =
-                    taskStatusService.changeStatus(1L, newStatus);
+            TaskEntity result = taskStatusService.changeStatus(1L, newStatus);
 
             assertEquals(newStatus, result.getStatus());
 
@@ -57,16 +54,11 @@ public class TaskStatusServiceTest {
     @EnumSource(TaskStatus.class)
     void shouldNotAddHistoryWhenStatusIsTheSame(TaskStatus status) {
 
-        TaskEntity task = TaskEntity.builder()
-                .id(1L)
-                .status(status)
-                .build();
+        TaskEntity task = createTask(status);
 
-        when(taskService.getTaskById(1L))
-                .thenReturn(task);
+        when(taskService.getTaskById(1L)).thenReturn(task);
 
-        TaskEntity result =
-                taskStatusService.changeStatus(1L, status);
+        TaskEntity result = taskStatusService.changeStatus(1L, status);
 
         assertEquals(status, result.getStatus());
 
@@ -77,5 +69,12 @@ public class TaskStatusServiceTest {
                 any(),
                 any()
         );
+    }
+
+    private TaskEntity createTask(TaskStatus status) {
+        return TaskEntity.builder()
+                .id(1L)
+                .status(status)
+                .build();
     }
 }
