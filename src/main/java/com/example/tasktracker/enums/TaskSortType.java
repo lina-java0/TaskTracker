@@ -8,5 +8,8 @@ public enum TaskSortType {
     DEADLINE_DESC,
 
     CREATED_AT_ASC,
-    CREATED_AT_DESC
+    CREATED_AT_DESC,
+
+    OWNER_USERNAME_ASC,
+    OWNER_USERNAME_DESC
 }

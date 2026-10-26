@@ -1,14 +1,16 @@
 package com.example.tasktracker.integration_tests.service;
 
-import com.example.tasktracker.dto.TaskFilterRequest;
-import com.example.tasktracker.dto.TaskRequest;
-import com.example.tasktracker.entities.TaskEntity;
-import com.example.tasktracker.entities.TaskHistoryEntity;
+import com.example.tasktracker.dto.task.request.TaskFilterRequest;
+import com.example.tasktracker.dto.task.request.TaskRequest;
+import com.example.tasktracker.entities.task.TaskEntity;
+import com.example.tasktracker.entities.task_history.TaskHistoryEntity;
+import com.example.tasktracker.entities.user.UserEntity;
 import com.example.tasktracker.enums.*;
-import com.example.tasktracker.exception.TaskNotFoundException;
-import com.example.tasktracker.repository.TaskHistoryRepository;
-import com.example.tasktracker.repository.TaskRepository;
-import com.example.tasktracker.service.TaskService;
+import com.example.tasktracker.exception.custom_exceptions.TaskNotFoundException;
+import com.example.tasktracker.repository.task_history.TaskHistoryRepository;
+import com.example.tasktracker.repository.task.TaskRepository;
+import com.example.tasktracker.repository.user.UserRepository;
+import com.example.tasktracker.service.task.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +35,21 @@ public class TaskServiceIntegrationTest {
     @Autowired
     private TaskHistoryRepository taskHistoryRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         taskHistoryRepository.deleteAll();
         taskRepository.deleteAll();
+        userRepository.deleteAll();
+
+        owner = userRepository.save(
+                new UserEntity("me", "testuser", "password", "ROLE_USER")
+        );
     }
+
+    private UserEntity owner;
 
     @Test
     void shouldCreateTaskAndSaveCreationHistory() {
@@ -84,6 +96,7 @@ public class TaskServiceIntegrationTest {
                 .priority(Priority.HIGH)
                 .category(Category.WORK)
                 .deadline(LocalDate.now().plusDays(2))
+                .owner(owner)
                 .build();
 
         TaskEntity personalTask = TaskEntity.builder()
@@ -93,6 +106,7 @@ public class TaskServiceIntegrationTest {
                 .priority(Priority.LOW)
                 .category(Category.PERSONAL)
                 .deadline(LocalDate.now().plusDays(5))
+                .owner(owner)
                 .build();
 
         taskRepository.saveAll(List.of(workTask, personalTask));
@@ -120,6 +134,7 @@ public class TaskServiceIntegrationTest {
                 .priority(Priority.HIGH)
                 .category(Category.WORK)
                 .deadline(LocalDate.now())
+                .owner(owner)
                 .build();
 
         TaskEntity savedTask = taskRepository.save(task);
@@ -155,6 +170,7 @@ public class TaskServiceIntegrationTest {
                 .priority(Priority.LOW)
                 .category(Category.PERSONAL)
                 .deadline(LocalDate.now())
+                .owner(owner)
                 .build();
 
         TaskEntity savedTask = taskRepository.save(task);

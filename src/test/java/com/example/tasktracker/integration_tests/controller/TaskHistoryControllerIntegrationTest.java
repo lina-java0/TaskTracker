@@ -1,10 +1,10 @@
 package com.example.tasktracker.integration_tests.controller;
 
-import com.example.tasktracker.dto.TaskRequest;
-import com.example.tasktracker.dto.TaskUpdateRequest;
+import com.example.tasktracker.dto.task.request.TaskRequest;
+import com.example.tasktracker.dto.task.request.TaskUpdateRequest;
 import com.example.tasktracker.enums.Category;
 import com.example.tasktracker.enums.Priority;
-import com.example.tasktracker.repository.TaskHistoryRepository;
+import com.example.tasktracker.repository.task_history.TaskHistoryRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;

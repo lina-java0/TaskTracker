@@ -1,9 +1,11 @@
 package com.example.tasktracker.integration_tests.controller;
 
-import com.example.tasktracker.dto.*;
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.dto.task.request.TaskRequest;
+import com.example.tasktracker.dto.task.request.TaskStatusRequest;
+import com.example.tasktracker.dto.task.request.TaskUpdateRequest;
+import com.example.tasktracker.entities.task.TaskEntity;
 import com.example.tasktracker.enums.*;
-import com.example.tasktracker.repository.TaskRepository;
+import com.example.tasktracker.repository.task.TaskRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,13 @@
 package com.example.tasktracker.unit_tests.controller;
 
-import com.example.tasktracker.controller.TaskHistoryController;
-import com.example.tasktracker.dto.TaskHistoryResponse;
+import com.example.tasktracker.controller.task_history.TaskHistoryController;
+import com.example.tasktracker.dto.task_history.TaskHistoryResponse;
 import com.example.tasktracker.enums.TaskHistoryAction;
-import com.example.tasktracker.service.TaskHistoryService;
+import com.example.tasktracker.service.task_history.TaskHistoryService;
+import com.example.tasktracker.service.task.TaskService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,11 +15,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskHistoryController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TaskHistoryControllerTest {
 
     @Autowired
@@ -25,6 +29,9 @@ class TaskHistoryControllerTest {
 
     @MockBean
     private TaskHistoryService taskHistoryService;
+
+    @MockBean
+    private TaskService taskService;
 
     @Test
     void shouldGetTaskHistory() throws Exception {
@@ -51,6 +58,8 @@ class TaskHistoryControllerTest {
                 .andExpect(jsonPath("$[0].description").value("Task created"))
                 .andExpect(jsonPath("$[0].oldValue").doesNotExist())
                 .andExpect(jsonPath("$[0].newValue").value("Test task"));
+
+        verify(taskHistoryService).getHistory(1L);
     }
 
     @Test

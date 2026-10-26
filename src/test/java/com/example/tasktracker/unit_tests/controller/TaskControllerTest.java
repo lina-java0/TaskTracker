@@ -1,13 +1,17 @@
 package com.example.tasktracker.unit_tests.controller;
 
-import com.example.tasktracker.controller.TaskController;
-import com.example.tasktracker.dto.TaskRequest;
-import com.example.tasktracker.dto.TaskUpdateRequest;
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.controller.task.TaskController;
+import com.example.tasktracker.dto.task.request.TaskRequest;
+import com.example.tasktracker.dto.task.request.TaskUpdateRequest;
+import com.example.tasktracker.entities.task.TaskEntity;
+import com.example.tasktracker.entities.user.UserEntity;
 import com.example.tasktracker.enums.*;
-import com.example.tasktracker.service.*;
+import com.example.tasktracker.service.task.TaskService;
+import com.example.tasktracker.service.task.TaskStatusService;
+import com.example.tasktracker.service.task.TaskUpdateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.mockito.ArgumentCaptor;
 
 @WebMvcTest(TaskController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TaskControllerTest {
 
     @Autowired
@@ -40,6 +45,9 @@ class TaskControllerTest {
 
     @MockBean
     private TaskStatusService taskStatusService;
+
+    private final UserEntity testUser =
+            new UserEntity("me", "testuser", "password", "ROLE_USER");
 
     @Test
     void shouldGetTasks() throws Exception {
@@ -61,6 +69,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.content[0].status").value("TODO"))
                 .andExpect(jsonPath("$.content[0].priority").value("MEDIUM"))
                 .andExpect(jsonPath("$.content[0].category").value("WORK"));
+
+        verify(taskService).getTasks(any(), eq(0), eq(20));
     }
 
     @Test
@@ -82,6 +92,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(11))
                 .andExpect(jsonPath("$.number").value(1))
                 .andExpect(jsonPath("$.size").value(10));
+
+        verify(taskService).getTasks(any(), eq(1), eq(10));
     }
 
     @Test
@@ -281,6 +293,7 @@ class TaskControllerTest {
                 .priority(Priority.MEDIUM)
                 .category(Category.WORK)
                 .deadline(LocalDate.of(2030, 1, 1))
+                .owner(testUser)
                 .build();
     }
 }

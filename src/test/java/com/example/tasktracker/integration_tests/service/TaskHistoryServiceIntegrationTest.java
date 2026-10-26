@@ -1,18 +1,18 @@
 package com.example.tasktracker.integration_tests.service;
 
-import com.example.tasktracker.dto.TaskHistoryResponse;
-import com.example.tasktracker.dto.TaskUpdateRequest;
-import com.example.tasktracker.entities.TaskEntity;
-import com.example.tasktracker.entities.TaskHistoryEntity;
+import com.example.tasktracker.dto.task_history.TaskHistoryResponse;
+import com.example.tasktracker.dto.task.request.TaskUpdateRequest;
+import com.example.tasktracker.entities.task.TaskEntity;
+import com.example.tasktracker.entities.task_history.TaskHistoryEntity;
 import com.example.tasktracker.enums.Category;
 import com.example.tasktracker.enums.Priority;
 import com.example.tasktracker.enums.TaskHistoryAction;
 import com.example.tasktracker.enums.TaskStatus;
-import com.example.tasktracker.repository.TaskHistoryRepository;
-import com.example.tasktracker.repository.TaskRepository;
-import com.example.tasktracker.service.TaskHistoryService;
-import com.example.tasktracker.service.TaskService;
-import com.example.tasktracker.service.TaskUpdateService;
+import com.example.tasktracker.repository.task_history.TaskHistoryRepository;
+import com.example.tasktracker.repository.task.TaskRepository;
+import com.example.tasktracker.service.task_history.TaskHistoryService;
+import com.example.tasktracker.service.task.TaskService;
+import com.example.tasktracker.service.task.TaskUpdateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

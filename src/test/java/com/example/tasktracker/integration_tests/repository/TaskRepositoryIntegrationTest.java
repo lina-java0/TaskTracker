@@ -1,8 +1,10 @@
 package com.example.tasktracker.integration_tests.repository;
 
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.entities.task.TaskEntity;
+import com.example.tasktracker.entities.user.UserEntity;
 import com.example.tasktracker.enums.*;
-import com.example.tasktracker.repository.TaskRepository;
+import com.example.tasktracker.repository.task.TaskRepository;
+import com.example.tasktracker.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +22,20 @@ public class TaskRepositoryIntegrationTest {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         taskRepository.deleteAll();
+        userRepository.deleteAll();
+
+        owner = userRepository.save(
+                new UserEntity("me", "testuser", "password", "ROLE_USER")
+        );
     }
+
+    private UserEntity owner;
 
     @Test
     void shouldSaveAndFindTask() {
@@ -34,6 +46,7 @@ public class TaskRepositoryIntegrationTest {
                 .priority(Priority.MEDIUM)
                 .deadline(LocalDate.now())
                 .category(Category.WORK)
+                .owner(owner)
                 .build();
 
         TaskEntity savedTask = taskRepository.save(task);

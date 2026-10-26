@@ -1,8 +1,8 @@
 package com.example.tasktracker.integration_tests.repository;
 
-import com.example.tasktracker.entities.TaskHistoryEntity;
+import com.example.tasktracker.entities.task_history.TaskHistoryEntity;
 import com.example.tasktracker.enums.TaskHistoryAction;
-import com.example.tasktracker.repository.TaskHistoryRepository;
+import com.example.tasktracker.repository.task_history.TaskHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,19 +30,20 @@ public class TaskHistoryRepositoryIntegrationTest {
     void shouldFindTaskHistoryOrderedByCreatedAt() {
 
         Long taskId = 1L;
+        LocalDateTime now = LocalDateTime.of(2026, 10, 14, 12, 0);
 
         TaskHistoryEntity older = TaskHistoryEntity.builder()
                 .taskId(taskId)
                 .action(TaskHistoryAction.CREATED)
                 .description("Task created")
-                .createdAt(LocalDateTime.now().minusMinutes(10))
+                .createdAt(now.minusMinutes(10))
                 .build();
 
         TaskHistoryEntity newer = TaskHistoryEntity.builder()
                 .taskId(taskId)
                 .action(TaskHistoryAction.TITLE_CHANGED)
                 .description("Title changed")
-                .createdAt(LocalDateTime.now())
+                .createdAt(now)
                 .build();
 
         taskHistoryRepository.save(older);
@@ -51,11 +52,16 @@ public class TaskHistoryRepositoryIntegrationTest {
         List<TaskHistoryEntity> history =
                 taskHistoryRepository.findByTaskIdOrderByCreatedAtAsc(taskId);
 
-        assertThat(history).hasSize(2);
-        assertThat(history.get(0).getAction()).isEqualTo(TaskHistoryAction.CREATED);
-        assertThat(history.get(0).getDescription()).isEqualTo("Task created");
+        assertThat(history)
+                .hasSize(2)
+                .extracting(TaskHistoryEntity::getAction)
+                .containsExactly(
+                        TaskHistoryAction.CREATED,
+                        TaskHistoryAction.TITLE_CHANGED
+                );
 
-        assertThat(history.get(1).getAction()).isEqualTo(TaskHistoryAction.TITLE_CHANGED);
-        assertThat(history.get(1).getDescription()).isEqualTo("Title changed");
+        assertThat(history)
+                .extracting(TaskHistoryEntity::getDescription)
+                .containsExactly("Task created", "Title changed");
     }
 }

@@ -1,6 +1,6 @@
 package com.example.tasktracker.unit_tests.validation;
 
-import com.example.tasktracker.dto.TaskFilterRequest;
+import com.example.tasktracker.dto.task.request.TaskFilterRequest;
 import com.example.tasktracker.validation.TaskFilterValidator;
 import org.junit.jupiter.api.Test;
 

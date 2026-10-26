@@ -1,9 +1,11 @@
 package com.example.tasktracker.unit_tests.service;
 
-import com.example.tasktracker.dto.TaskUpdateRequest;
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.dto.task.request.TaskUpdateRequest;
+import com.example.tasktracker.entities.task.TaskEntity;
 import com.example.tasktracker.enums.*;
-import com.example.tasktracker.service.*;
+import com.example.tasktracker.service.task.TaskService;
+import com.example.tasktracker.service.task.TaskUpdateService;
+import com.example.tasktracker.service.task_history.TaskHistoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

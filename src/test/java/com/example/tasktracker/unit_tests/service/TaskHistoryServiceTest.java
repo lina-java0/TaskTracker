@@ -1,10 +1,10 @@
 package com.example.tasktracker.unit_tests.service;
 
-import com.example.tasktracker.dto.TaskHistoryResponse;
-import com.example.tasktracker.entities.TaskHistoryEntity;
+import com.example.tasktracker.dto.task_history.TaskHistoryResponse;
+import com.example.tasktracker.entities.task_history.TaskHistoryEntity;
 import com.example.tasktracker.enums.TaskHistoryAction;
-import com.example.tasktracker.repository.TaskHistoryRepository;
-import com.example.tasktracker.service.TaskHistoryService;
+import com.example.tasktracker.repository.task_history.TaskHistoryRepository;
+import com.example.tasktracker.service.task_history.TaskHistoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

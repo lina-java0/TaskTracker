@@ -1,7 +1,7 @@
 package com.example.tasktracker.unit_tests.service;
 
 import com.example.tasktracker.enums.TaskSortType;
-import com.example.tasktracker.service.TaskSortService;
+import com.example.tasktracker.service.task.TaskSortService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

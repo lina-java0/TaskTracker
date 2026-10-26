@@ -1,22 +1,21 @@
 package com.example.tasktracker.validation;
 
-import com.example.tasktracker.dto.TaskFilterRequest;
+import com.example.tasktracker.dto.task.request.TaskFilterRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
+@RequiredArgsConstructor
 public class TaskFilterValidator {
 
-    public void validate(TaskFilterRequest filterRequest) {
-        if (Boolean.TRUE.equals(filterRequest.getWithoutDeadline())
-                && hasDeadlineFilter(filterRequest)) {
-            throw new IllegalArgumentException(
-                    "Filter withoutDeadline cannot be combined with deadline filters");
-        }
-    }
+    private final List<TaskFilterValidationRule> validationRules;
 
-    private boolean hasDeadlineFilter(TaskFilterRequest filterRequest) {
-        return filterRequest.getDeadline() != null
-                || filterRequest.getDeadlineAfter() != null
-                || filterRequest.getDeadlineBefore() != null;
+    public void validate(TaskFilterRequest request) {
+
+        for (TaskFilterValidationRule rule : validationRules) {
+            rule.validate(request);
+        }
     }
 }

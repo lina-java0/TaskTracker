@@ -1,6 +1,7 @@
 package com.example.tasktracker.specification;
 
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.entities.task.TaskEntity;
+import com.example.tasktracker.entities.user.UserEntity;
 import com.example.tasktracker.enums.Category;
 import com.example.tasktracker.enums.Priority;
 import com.example.tasktracker.enums.TaskStatus;
@@ -54,6 +55,19 @@ public class TaskSpecifications {
     public static Specification<TaskEntity> hasDeadlineBefore(LocalDate date) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.lessThanOrEqualTo(root.get("deadline"), date);
+    }
+
+    public static Specification<TaskEntity> hasOwner(UserEntity owner) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("owner").get("id"), owner.getId());
+    }
+
+    public static Specification<TaskEntity> hasOwnerUsername(String username) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(
+                        criteriaBuilder.lower(root.get("owner").get("username")),
+                        username.toLowerCase(Locale.ROOT)
+                );
     }
 
     public static Specification<TaskEntity> priorityOrder(boolean highToLow) {

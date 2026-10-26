@@ -1,7 +1,7 @@
 package com.example.tasktracker.specification;
 
-import com.example.tasktracker.dto.TaskFilterRequest;
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.dto.task.request.TaskFilterRequest;
+import com.example.tasktracker.entities.task.TaskEntity;
 import com.example.tasktracker.enums.TaskSortType;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -52,6 +52,11 @@ public class TaskSpecificationBuilder {
         if (Boolean.TRUE.equals(filterRequest.getWithoutDeadline())) {
             specification = specification.and(
                     TaskSpecifications.withoutDeadline());
+        }
+
+        if (filterRequest.getOwnerUsername() != null && !filterRequest.getOwnerUsername().isBlank()) {
+            specification = specification.and(
+                    TaskSpecifications.hasOwnerUsername(filterRequest.getOwnerUsername().trim()));
         }
 
         TaskSortType sortType = filterRequest.getSortType();

@@ -1,8 +1,10 @@
 package com.example.tasktracker.unit_tests.service;
 
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.entities.task.TaskEntity;
 import com.example.tasktracker.enums.*;
-import com.example.tasktracker.service.*;
+import com.example.tasktracker.service.task.TaskService;
+import com.example.tasktracker.service.task.TaskStatusService;
+import com.example.tasktracker.service.task_history.TaskHistoryService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

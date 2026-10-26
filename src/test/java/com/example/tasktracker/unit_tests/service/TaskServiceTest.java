@@ -1,11 +1,16 @@
 package com.example.tasktracker.unit_tests.service;
 
-import com.example.tasktracker.dto.*;
-import com.example.tasktracker.entities.TaskEntity;
+import com.example.tasktracker.dto.task.request.TaskFilterRequest;
+import com.example.tasktracker.dto.task.request.TaskRequest;
+import com.example.tasktracker.entities.task.TaskEntity;
+import com.example.tasktracker.entities.user.UserEntity;
 import com.example.tasktracker.enums.*;
-import com.example.tasktracker.exception.TaskNotFoundException;
-import com.example.tasktracker.repository.TaskRepository;
-import com.example.tasktracker.service.*;
+import com.example.tasktracker.exception.custom_exceptions.TaskNotFoundException;
+import com.example.tasktracker.repository.task.TaskRepository;
+import com.example.tasktracker.service.user.CurrentUserService;
+import com.example.tasktracker.service.task.TaskService;
+import com.example.tasktracker.service.task.TaskSortService;
+import com.example.tasktracker.service.task_history.TaskHistoryService;
 import com.example.tasktracker.validation.TaskFilterValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,11 +46,16 @@ class TaskServiceTest {
     @Mock
     private TaskHistoryService taskHistoryService;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private TaskService taskService;
 
     @Test
     void shouldCreateTaskAndAddHistory() {
+
+        UserEntity owner = createAndMockOwner();
 
         TaskRequest request = TaskRequest.builder()
                 .title("Learn Mockito")
@@ -63,6 +73,7 @@ class TaskServiceTest {
                 .deadline(LocalDate.of(2026, 10, 10))
                 .category(Category.STUDY)
                 .status(TaskStatus.TODO)
+                .owner(owner)
                 .build();
 
         when(taskRepository.save(any(TaskEntity.class))).thenReturn(savedTask);
@@ -85,6 +96,9 @@ class TaskServiceTest {
         assertEquals(TaskStatus.TODO, createdTask.getStatus());
 
         assertEquals(savedTask, result);
+        assertSame(owner, createdTask.getOwner());
+
+        verify(currentUserService).getCurrentUser();
 
         verify(taskHistoryService).addHistory(
                 1L,
@@ -120,6 +134,8 @@ class TaskServiceTest {
 
     @Test
     void shouldGetTasksWithFiltersAndSorting() {
+
+        UserEntity owner = createAndMockOwner();
 
         TaskFilterRequest filterRequest = TaskFilterRequest.builder()
                 .category(Category.WORK)
@@ -167,26 +183,30 @@ class TaskServiceTest {
                 .id(1L)
                 .build();
 
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+        UserEntity owner = createAndMockOwner();
+
+        when(taskRepository.findByIdAndOwner(1L, owner)).thenReturn(Optional.of(task));
 
         TaskEntity result = taskService.getTaskById(1L);
 
         assertEquals(task, result);
 
-        verify(taskRepository).findById(1L);
+        verify(taskRepository).findByIdAndOwner(1L, owner);
     }
 
     @Test
     void shouldThrowExceptionWhenTaskNotFound() {
 
-        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+        UserEntity owner = createAndMockOwner();
+
+        when(taskRepository.findByIdAndOwner(1L, owner)).thenReturn(Optional.empty());
 
         assertThrows(
                 TaskNotFoundException.class,
                 () -> taskService.getTaskById(1L)
         );
 
-        verify(taskRepository).findById(1L);
+        verify(taskRepository).findByIdAndOwner(1L, owner);
     }
 
     @Test
@@ -196,7 +216,9 @@ class TaskServiceTest {
                 .id(1L)
                 .build();
 
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+        UserEntity owner = createAndMockOwner();
+
+        when(taskRepository.findByIdAndOwner(1L, owner)).thenReturn(Optional.of(task));
 
         taskService.deleteTask(1L);
 
@@ -209,5 +231,15 @@ class TaskServiceTest {
         );
 
         verify(taskRepository).delete(task);
+    }
+
+    private UserEntity createAndMockOwner() {
+        UserEntity owner = UserEntity.builder()
+                .id(1L)
+                .build();
+
+        when(currentUserService.getCurrentUser()).thenReturn(owner);
+
+        return owner;
     }
 }
