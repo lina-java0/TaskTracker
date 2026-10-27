@@ -1,4 +1,4 @@
-package com.example.tasktracker.unit_tests.service;
+package com.example.tasktracker.unit_tests.service.task;
 
 import com.example.tasktracker.entities.task.TaskEntity;
 import com.example.tasktracker.enums.*;
@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -33,24 +34,25 @@ public class TaskStatusServiceTest {
             value = TaskStatus.class,
             names = {"IN_PROGRESS", "DONE"}
     )
-        void shouldChangeStatusAndAddHistory(TaskStatus newStatus) {
+    void shouldChangeStatusAndAddHistory(TaskStatus newStatus) {
 
-            TaskEntity task = createTask(TaskStatus.TODO);
+        TaskEntity task = createTask(TaskStatus.TODO);
 
-            when(taskService.getTaskById(1L)).thenReturn(task);
+        when(taskService.getTaskById(1L)).thenReturn(task);
 
-            TaskEntity result = taskStatusService.changeStatus(1L, newStatus);
+        TaskEntity result = taskStatusService.changeStatus(1L, newStatus);
 
-            assertEquals(newStatus, result.getStatus());
+        assertSame(task, result);
+        assertEquals(newStatus, result.getStatus());
 
-            verify(taskHistoryService).addHistory(
-                    1L,
-                    TaskHistoryAction.STATUS_CHANGED,
-                    "Status changed",
-                    "TODO",
-                    newStatus.name()
-            );
-        }
+        verify(taskHistoryService).addHistory(
+                1L,
+                TaskHistoryAction.STATUS_CHANGED,
+                "Status changed",
+                "TODO",
+                newStatus.name()
+        );
+    }
 
     @ParameterizedTest
     @EnumSource(TaskStatus.class)

@@ -1,4 +1,4 @@
-package com.example.tasktracker.validation.pagination;
+package com.example.tasktracker.validation.pagination_validation;
 
 import com.example.tasktracker.enums.ErrorCode;
 import com.example.tasktracker.validation.PaginationValidationRule;
@@ -8,20 +8,17 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(2)
+@Order(1)
 @RequiredArgsConstructor
-public class PageSizeValidator implements PaginationValidationRule {
-
-    private static final int MIN_SIZE = 1;
-    private static final int MAX_SIZE = 100;
+public class PageIndexValidator implements PaginationValidationRule {
 
     private final ValidationExceptionFactory validationExceptionFactory;
 
     @Override
     public void validate(int page, int size) {
-        if (size < MIN_SIZE || size > MAX_SIZE) {
+        if (page < 0) {
             throw validationExceptionFactory.create(
-                    ErrorCode.INVALID_PAGE_SIZE);
+                    ErrorCode.INVALID_PAGE);
         }
     }
 }

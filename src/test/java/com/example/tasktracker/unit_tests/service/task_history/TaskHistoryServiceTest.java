@@ -1,4 +1,4 @@
-package com.example.tasktracker.unit_tests.service;
+package com.example.tasktracker.unit_tests.service.task_history;
 
 import com.example.tasktracker.dto.task_history.TaskHistoryResponse;
 import com.example.tasktracker.entities.task_history.TaskHistoryEntity;

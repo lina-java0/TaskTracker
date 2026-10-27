@@ -1,4 +1,4 @@
-package com.example.tasktracker.validation.validation;
+package com.example.tasktracker.validation.task_validation;
 
 import com.example.tasktracker.dto.task.request.TaskFilterRequest;
 import com.example.tasktracker.enums.TaskSortType;

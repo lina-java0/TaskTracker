@@ -1,72 +1,89 @@
 package com.example.tasktracker.unit_tests.validation;
 
 import com.example.tasktracker.dto.task.request.TaskFilterRequest;
+import com.example.tasktracker.enums.ErrorCode;
+import com.example.tasktracker.exception.custom_exceptions.ValidationException;
+import com.example.tasktracker.validation.TaskFilterValidationRule;
 import com.example.tasktracker.validation.TaskFilterValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-class TaskFilterValidatorTest {
+public class TaskFilterValidatorTest {
 
-    private final TaskFilterValidator validator = new TaskFilterValidator();
+    private TaskFilterValidationRule firstRule;
+    private TaskFilterValidationRule secondRule;
+    private TaskFilterValidator validator;
 
-    @Test
-    void shouldNotThrowWhenWithoutDeadlineHasNoDeadlineFilters() {
-        TaskFilterRequest request = TaskFilterRequest.builder()
-                .withoutDeadline(true)
-                .build();
+    @BeforeEach
+    void setUp() {
+        firstRule = mock(TaskFilterValidationRule.class);
+        secondRule = mock(TaskFilterValidationRule.class);
 
-        assertDoesNotThrow(() -> validator.validate(request));
-    }
-
-    @Test
-    void shouldThrowWhenWithoutDeadlineCombinedWithDeadline() {
-        TaskFilterRequest request = TaskFilterRequest.builder()
-                .withoutDeadline(true)
-                .deadline(LocalDate.now())
-                .build();
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> validator.validate(request)
+        validator = new TaskFilterValidator(
+                List.of(firstRule, secondRule)
         );
     }
 
     @Test
-    void shouldThrowWhenWithoutDeadlineCombinedWithDeadlineAfter() {
+    void shouldPassSameRequestToAllRules() {
         TaskFilterRequest request = TaskFilterRequest.builder()
-                .withoutDeadline(true)
-                .deadlineAfter(LocalDate.now())
+                .ownerUsername("testuser")
                 .build();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> validator.validate(request)
-        );
+        validator.validate(request);
+
+        verify(firstRule).validate(same(request));
+        verify(secondRule).validate(same(request));
     }
 
     @Test
-    void shouldThrowWhenWithoutDeadlineCombinedWithDeadlineBefore() {
-        TaskFilterRequest request = TaskFilterRequest.builder()
-                .withoutDeadline(true)
-                .deadlineBefore(LocalDate.now())
-                .build();
+    void shouldStopValidationWhenFirstRuleThrowsException() {
+        TaskFilterRequest request = TaskFilterRequest.builder().build();
+        ValidationException exception = new ValidationException(
+                ErrorCode.INVALID_REQUEST,
+                "Invalid request"
+        );
 
-        assertThrows(
-                IllegalArgumentException.class,
+        doThrow(exception)
+                .when(firstRule)
+                .validate(request);
+
+        ValidationException thrown = assertThrows(
+                ValidationException.class,
                 () -> validator.validate(request)
         );
+
+        assertSame(exception, thrown);
+
+        verify(firstRule).validate(request);
+        verifyNoInteractions(secondRule);
     }
 
     @Test
-    void shouldNotThrowWhenDeadlineFilterUsedWithoutWithoutDeadline() {
-        TaskFilterRequest request = TaskFilterRequest.builder()
-                .deadline(LocalDate.now())
-                .build();
+    void shouldStopValidationWhenSecondRuleThrowsException() {
+        TaskFilterRequest request = TaskFilterRequest.builder().build();
+        ValidationException exception = new ValidationException(
+                ErrorCode.INVALID_REQUEST,
+                "Invalid request"
+        );
 
-        assertDoesNotThrow(() -> validator.validate(request));
+        doThrow(exception)
+                .when(secondRule)
+                .validate(request);
+
+        ValidationException thrown = assertThrows(
+                ValidationException.class,
+                () -> validator.validate(request)
+        );
+
+        assertSame(exception, thrown);
+
+        verify(firstRule).validate(request);
+        verify(secondRule).validate(request);
     }
 }

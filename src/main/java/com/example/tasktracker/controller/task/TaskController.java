@@ -7,6 +7,7 @@ import com.example.tasktracker.dto.task.request.TaskUpdateRequest;
 import com.example.tasktracker.dto.task.response.ApiResponse;
 import com.example.tasktracker.dto.task.response.TaskResponse;
 import com.example.tasktracker.entities.task.TaskEntity;
+import com.example.tasktracker.mapper.task.TaskMapper;
 import com.example.tasktracker.service.task.TaskService;
 import com.example.tasktracker.service.task.TaskStatusService;
 import com.example.tasktracker.service.task.TaskUpdateService;
@@ -25,6 +26,7 @@ public class TaskController {
     private final TaskService taskService;
     private final TaskUpdateService taskUpdateService;
     private final TaskStatusService taskStatusService;
+    private final TaskMapper taskMapper;
 
     @GetMapping
     public ResponseEntity<Page<TaskResponse>> getTasks(
@@ -32,13 +34,7 @@ public class TaskController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        Page<TaskResponse> response = taskService.getTaskResponses(
-                filterRequest,
-                page,
-                size
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(taskService.getTaskResponse(filterRequest, page, size));
     }
 
     @GetMapping("/{id}")
@@ -47,7 +43,7 @@ public class TaskController {
     ) {
         TaskEntity task = taskService.getTaskById(id);
 
-        return ResponseEntity.ok(toResponse(task));
+        return ResponseEntity.ok(taskMapper.toResponse(task));
     }
 
     @PostMapping
@@ -60,7 +56,7 @@ public class TaskController {
                 .status(201)
                 .body(new ApiResponse<>(
                         "Task created successfully",
-                        toResponse(task)
+                        taskMapper.toResponse(task)
                 ));
     }
 
@@ -73,7 +69,7 @@ public class TaskController {
 
         return ResponseEntity.ok(new ApiResponse<>(
                 "Task updated successfully",
-                toResponse(updatedTask)
+                taskMapper.toResponse(updatedTask)
         ));
     }
 
@@ -86,7 +82,7 @@ public class TaskController {
 
         return ResponseEntity.ok(new ApiResponse<>(
                 "Task status changed successfully",
-                toResponse(updatedTask)
+                taskMapper.toResponse(updatedTask)
         ));
     }
 
@@ -100,20 +96,5 @@ public class TaskController {
                         "Task deleted successfully",
                         null
                 ));
-    }
-
-    private TaskResponse toResponse(TaskEntity task) {
-        return new TaskResponse(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getStatus(),
-                task.getPriority(),
-                task.getDeadline(),
-                task.getCategory(),
-                task.getCreatedAt(),
-                task.getUpdatedAt(),
-                task.getOwner().getUsername()
-        );
     }
 }

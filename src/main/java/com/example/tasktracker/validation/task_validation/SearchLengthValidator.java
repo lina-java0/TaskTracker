@@ -1,4 +1,4 @@
-package com.example.tasktracker.validation.validation;
+package com.example.tasktracker.validation.task_validation;
 
 import com.example.tasktracker.dto.task.request.TaskFilterRequest;
 import com.example.tasktracker.enums.ErrorCode;
@@ -9,21 +9,24 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(2)
+@Order(4)
 @RequiredArgsConstructor
-public class DeadlineRangeValidator implements TaskFilterValidationRule  {
+public class SearchLengthValidator implements TaskFilterValidationRule {
+
+    private static final int MAX_LENGTH = 100;
 
     private final ValidationExceptionFactory validationExceptionFactory;
 
     @Override
     public void validate(TaskFilterRequest request) {
 
-        if (request.getDeadlineBefore() != null
-                && request.getDeadlineAfter() != null
-                && request.getDeadlineAfter().isAfter(request.getDeadlineBefore())) {
+        String search = request.getSearch();
+
+        if (search != null && search.strip().length() > MAX_LENGTH) {
 
             throw validationExceptionFactory.create(
-                    ErrorCode.INVALID_DEADLINE_RANGE
+                    ErrorCode.SEARCH_TOO_LONG,
+                    MAX_LENGTH
             );
         }
     }

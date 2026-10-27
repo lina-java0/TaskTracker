@@ -1,4 +1,4 @@
-package com.example.tasktracker.validation.validation;
+package com.example.tasktracker.validation.task_validation;
 
 import com.example.tasktracker.dto.task.request.TaskFilterRequest;
 import com.example.tasktracker.enums.ErrorCode;
@@ -9,9 +9,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(1)
+@Order(2)
 @RequiredArgsConstructor
-public class DeadlineFilterValidator implements TaskFilterValidationRule {
+public class WithoutDeadlineConflictValidator implements TaskFilterValidationRule {
 
     private final ValidationExceptionFactory validationExceptionFactory;
 
@@ -22,13 +22,7 @@ public class DeadlineFilterValidator implements TaskFilterValidationRule {
 
         boolean hasDeadlineRange =
                 request.getDeadlineBefore() != null
-                || request.getDeadlineAfter() != null;
-
-        if (hasExactDeadline && hasDeadlineRange) {
-            throw validationExceptionFactory.create(
-                    ErrorCode.DEADLINE_FILTER_CONFLICT
-            );
-        }
+                        || request.getDeadlineAfter() != null;
 
         if (Boolean.TRUE.equals(request.getWithoutDeadline())
                 && (hasExactDeadline || hasDeadlineRange)) {

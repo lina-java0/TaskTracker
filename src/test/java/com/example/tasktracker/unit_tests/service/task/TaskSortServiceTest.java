@@ -1,4 +1,4 @@
-package com.example.tasktracker.unit_tests.service;
+package com.example.tasktracker.unit_tests.service.task;
 
 import com.example.tasktracker.enums.TaskSortType;
 import com.example.tasktracker.service.task.TaskSortService;
@@ -15,16 +15,18 @@ public class TaskSortServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-            "DEADLINE_ASC,    ASC,  deadline",
-            "DEADLINE_DESC,   DESC, deadline",
-            "CREATED_AT_ASC,  ASC,  createdAt",
-            "CREATED_AT_DESC, DESC, createdAt"
+            "DEADLINE_ASC,        ASC,  deadline",
+            "DEADLINE_DESC,       DESC, deadline",
+            "CREATED_AT_ASC,      ASC,  createdAt",
+            "CREATED_AT_DESC,     DESC, createdAt",
+            "OWNER_USERNAME_ASC,  ASC,  owner.username",
+            "OWNER_USERNAME_DESC, DESC, owner.username"
     })
     void shouldReturnCorrectSort(
             TaskSortType sortType,
             Sort.Direction direction,
-            String property) {
-
+            String property
+    ) {
         Sort sort = taskSortService.getSort(sortType);
 
         assertEquals(
