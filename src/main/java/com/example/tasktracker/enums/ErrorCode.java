@@ -67,6 +67,7 @@ public enum ErrorCode {
             "error.security.forbidden",
             HttpStatus.FORBIDDEN
     ),
+
     TASK_NOT_FOUND(
             "error.task-not-found",
             HttpStatus.NOT_FOUND
@@ -75,6 +76,10 @@ public enum ErrorCode {
     USERNAME_ALREADY_EXISTS(
             "error.user.username.already-exists",
             HttpStatus.CONFLICT
+    ),
+    AUTHENTICATED_USER_NOT_FOUND(
+            "error.user.authenticated.not-found",
+            HttpStatus.INTERNAL_SERVER_ERROR
     ),
 
     INTERNAL_ERROR(

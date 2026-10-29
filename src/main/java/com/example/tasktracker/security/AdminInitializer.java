@@ -1,4 +1,4 @@
-package com.example.tasktracker.security_config;
+package com.example.tasktracker.security;
 
 import com.example.tasktracker.entities.user.UserEntity;
 import com.example.tasktracker.repository.user.UserRepository;
@@ -46,5 +46,4 @@ public class AdminInitializer implements ApplicationRunner {
 
         userRepository.save(admin);
     }
-
 }

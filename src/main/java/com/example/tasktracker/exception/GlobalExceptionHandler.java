@@ -3,6 +3,7 @@ package com.example.tasktracker.exception;
 import com.example.tasktracker.dto.error.ErrorResponse;
 import com.example.tasktracker.enums.ErrorCode;
 import com.example.tasktracker.exception.custom_exceptions.*;
+import com.example.tasktracker.exception.custom_exceptions.AuthenticatedUserNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -173,6 +174,18 @@ public class GlobalExceptionHandler {
             UsernameAlreadyExistsException ex
     ) {
         ErrorCode errorCode = ErrorCode.USERNAME_ALREADY_EXISTS;
+
+        return buildResponse(
+                errorCode,
+                resolveMessage(errorCode, null)
+        );
+    }
+
+    @ExceptionHandler(AuthenticatedUserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticatedUserNotFound(
+            AuthenticatedUserNotFoundException ex
+    ) {
+        ErrorCode errorCode = ErrorCode.AUTHENTICATED_USER_NOT_FOUND;
 
         return buildResponse(
                 errorCode,

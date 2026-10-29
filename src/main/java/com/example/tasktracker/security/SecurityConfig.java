@@ -1,7 +1,7 @@
-package com.example.tasktracker.security_config;
+package com.example.tasktracker.security;
 
-import com.example.tasktracker.security_config.exception.CustomAccessDeniedHandler;
-import com.example.tasktracker.security_config.exception.CustomAuthenticationEntryPoint;
+import com.example.tasktracker.security.exceptionHandler.CustomAccessDeniedHandler;
+import com.example.tasktracker.security.exceptionHandler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

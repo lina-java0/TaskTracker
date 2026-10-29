@@ -1,4 +1,4 @@
-package com.example.tasktracker.security_config;
+package com.example.tasktracker.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.util.matcher.RequestMatcher;

@@ -238,11 +238,8 @@ class TaskServiceTest {
                 .owner(owner)
                 .build();
 
-        TaskResponse firstResponse =
-                createTaskResponse(1L, "First task");
-
-        TaskResponse secondResponse =
-                createTaskResponse(2L, "Second task");
+        TaskResponse firstResponse = createTaskResponse(1L, "First task");
+        TaskResponse secondResponse = createTaskResponse(2L, "Second task");
 
         return Stream.of(
                 new TaskResponseCase(
@@ -281,8 +278,7 @@ class TaskServiceTest {
                     .thenReturn(expectedResponses.get(i));
         }
 
-        Page<TaskResponse> result =
-                taskService.getTaskResponse(null, 0, 20);
+        Page<TaskResponse> result = taskService.getTaskResponse(null, 0, 20);
 
         assertEquals(expectedResponses.size(), result.getTotalElements());
         assertEquals(expectedResponses, result.getContent());

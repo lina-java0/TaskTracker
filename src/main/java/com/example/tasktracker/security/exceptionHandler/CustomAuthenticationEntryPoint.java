@@ -1,9 +1,8 @@
-package com.example.tasktracker.security_config.exception;
+package com.example.tasktracker.security.exceptionHandler;
 
 import com.example.tasktracker.enums.ErrorCode;
-import com.example.tasktracker.security_config.ApiRequestMatcher;
-import com.example.tasktracker.security_config.SecurityErrorResponseWriter;
-import jakarta.servlet.ServletException;
+import com.example.tasktracker.security.ApiRequestMatcher;
+import com.example.tasktracker.security.SecurityErrorResponseWriter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException
-    ) throws IOException, ServletException {
+    ) throws IOException {
 
         if (apiRequestMatcher.matches(request)) {
             responseWriter.write(
@@ -34,9 +33,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             return;
         }
 
-        response.sendRedirect(
-                request.getContextPath() + "/login"
-        );
-
+        response.sendRedirect(request.getContextPath() + "/login");
     }
 }

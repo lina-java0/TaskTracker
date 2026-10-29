@@ -1,4 +1,4 @@
-package com.example.tasktracker.security_config;
+package com.example.tasktracker.security;
 
 import com.example.tasktracker.dto.error.ErrorResponse;
 import com.example.tasktracker.enums.ErrorCode;
